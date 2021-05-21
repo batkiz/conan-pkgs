@@ -30,7 +30,7 @@ class ZLMediaKitConan(ConanFile):
         "fPIC": True,
         "hls": True,
         "openssl": True,
-        "mysql": True,
+        "mysql": False,
         "faac": False,
         "x264": True,
         "mp4": True,
@@ -64,7 +64,8 @@ class ZLMediaKitConan(ConanFile):
 
     def source(self):
         self.run("git clone --depth 1 https://gitee.com/xia-chu/ZLMediaKit")
-        self.run("git clone https://gitee.com/xia-chu/media-server.git")
+        self.run("git clone --depth 1 https://gitee.com/xia-chu/media-server")
+        self.run("git clone --depth 1 https://github.com/ireader/sdk")
         # This small hack might be useful to guarantee proper /MT /MD linkage
         # in MSVC if the packaged project doesn't have variables to set it
         # properly
@@ -216,11 +217,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})''')
 
     def package(self):
         self.copy("*.h", dst="include", src="ZLMediaKit/src")
+        self.copy("*.h", dst="include", src="media-server", keep_path=False)
         self.copy("*ZLMediaKit.lib", dst="lib", keep_path=False)
         self.copy("*.dll", dst="bin", keep_path=False)
         self.copy("*.so", dst="bin", keep_path=False)
         self.copy("*.dylib", dst="lib", keep_path=False)
         self.copy("*.a", dst="lib", keep_path=False)
+        self.copy(pattern="*.pdb", dst="bin", src="bin")
+
 
     def package_info(self):
         self.cpp_info.libs = ["ZLMediaKit"]
